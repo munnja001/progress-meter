@@ -1,0 +1,39 @@
+buildscript {
+    /* Once the new version of this plugin is released we will not have to use the lib anymore
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url 'http://dl.bintray.com/robfletcher/gradle-plugins' }
+    }
+    dependencies {
+        classpath 'org.gradle.plugins:gradle-compass:1.0.10'
+    }
+    */
+    dependencies {
+        classpath files('lib/gradle-compass-1.0.10-SNAPSHOT.jar')
+    }
+}
+
+apply plugin: 'compass'
+
+repositories {
+    mavenCentral()
+}
+
+compass {
+    gems = [
+        "bootstrap-sass",
+        "compass"
+    ]
+    jvmArgs = '-Xmx512m'
+    encoding = 'UTF-8'
+	debugInfo = false
+	noLineComments = true
+    cssDir = file('css')
+    sassDir = file('scss')
+}
+
+// temporary fix for the watchSass task to work
+watchSass {
+    background = false
+}

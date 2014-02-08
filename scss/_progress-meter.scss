@@ -1,0 +1,192 @@
+
+@mixin progress-meter($stepCount: 4, $includeStandardCSS: true) {
+  
+  $maxStepCount: 6;
+  $minStepCount: 2;
+  $stepBulbWidths: nil;
+  $stepLabelWidths: nil;
+  @if $stepCount == 2 {
+    $stepBulbWidths: 25%, 75%;
+    $stepLabelWidths: 50%, 50%;
+  } @if $stepCount == 3 {
+    $stepBulbWidths: 20%, 50%, 80%;
+    $stepLabelWidths: 40%, 20%, 40%;
+  } @else if $stepCount == 4 {
+    $stepBulbWidths: 10%, 35%, 65%, 90%;
+    $stepLabelWidths: 20%, 30%, 30%, 20%;
+  } @else if $stepCount == 5 {
+    $stepBulbWidths: 6%, 28%, 50%, 72%, 94%;
+    $stepLabelWidths: 12%, 32%, 12%, 32%, 12%;
+  } @else if $stepCount == 6 {
+    $stepBulbWidths: 10%, 26%, 42%, 58%, 74%, 90%;
+    $stepLabelWidths: 20%, 12%, 20%, 12%, 20%, 12%;
+  }
+  
+  // We only want to display the standard CSS if required, this prevent there being duplicate CSS
+  // when we support multiple meter sizes on the same pages 
+  @if $includeStandardCSS {
+    .progress-meter-container {
+      .bulb {
+        @include border-radius(1.8em);
+        @include single-transition(width 0.4s ease-in-out);
+        background: $white;
+        height: 1.8em;
+        margin-left: -1em;
+        position: absolute;
+        top: 0;
+        width: 1.8em;
+        z-index: 3;
+        &.clickable {
+          cursor: pointer;
+        }
+      }
+      
+      .bulb-bg {
+        @include border-radius(1.8em);
+        @include box-shadow(rgba(black, 0.4) 0 0 5px);
+        background: $white;
+        height: 1.8em;
+        margin-left: -1em;
+        position: absolute;
+        top: 0;
+        width: 1.8em;
+        z-index: 0;
+      }
+      
+      .bulb-inner {
+        @include border-radius(1.8em);
+        margin-left: -.8em;
+        position: absolute;
+        top: .2em;
+        height: 1.4em;
+        width: 1.4em;
+        z-index: 5;
+        &.clickable {
+          cursor: pointer;
+        }
+      }
+      
+      .meter {
+        @include border-radius(1em);
+        @include single-transition(width 0.4s ease-in-out);
+        background: $accent;
+        float: left;
+        height: .4em;
+        position: relative;
+        width: 10%;
+        top: -.1em;
+        left: .5%;
+        z-index: 4;
+      }
+      
+      .meter-bg {
+        @include border-radius(2em);
+        @include box-shadow(rgba(black, 0.4) 0 0 5px);
+        background: $white;
+        height: .8em;
+        position: relative;
+        padding: .25em;
+        top: .5em;
+        width: 100%;
+        z-index: 3;
+      }
+      
+      .progress-icon {
+		line-height: 1.8em;
+        height: 1.8em;
+        width: 1.8em;
+        margin-left: -1em;
+        margin-bottom: .5em;
+        background-repeat: no-repeat;
+        background-position: center;
+		text-align: center;
+        position: relative;
+      }
+      
+      .meter-container {
+        position: relative;
+        height: 2em;
+      }
+      
+      .step-labels {
+        float: left;
+        width: 100%;
+        .step-lbl {
+          cursor: default;
+          float: left;
+          padding-top: .5em;
+          margin-bottom: 1.5em;
+          text-align: center;
+          font-size: .875em;
+          color: $light_text;
+		  &:hover {
+			  text-decoration: none;
+		  }
+          &.clickable {
+            cursor: pointer;
+		  	&:hover {
+		      text-decoration: initial;
+		  	}
+          }
+        }
+      }
+    }
+    
+  
+    .progress-meter-container {
+      // By default, hide all additional bulbs and labels
+      .bulb, .bulb-bg, .bulb-inner, .step-lbl {
+        display: none;
+      }
+	  
+      @for $i from 1 through $maxStepCount {
+        &.step#{$i} {
+          @if $i != 1 {
+              $prev: $i - 1;
+              @extend .step#{$prev}; 
+          }
+          .bulb-inner.step#{$i} {
+              background: $accent;
+          }
+          .step-lbl.step#{$i} {
+              color: $text;
+              font-weight: 700;
+          }
+        }
+      }
+    }
+    
+  }
+  
+   //Creates styles that are specific based upon the number of steps.
+   //This includes bulb position, meter width, icon location, and label width
+  .progress-meter-container.steps#{$stepCount} {
+  
+    @for $i from 1 through $stepCount {
+      $bulbWidth: nth($stepBulbWidths, $i);
+      // Position the bulbs based upon the configured widths for the number of steps 
+      .bulb-bg.step#{$i}, .bulb.step#{$i}, .bulb-inner.step#{$i} {
+          display: block;
+          left: $bulbWidth;
+      }
+      // Move the meter and icon by the same amout as the bulb width 
+      &.step#{$i} {
+        .meter {
+            width: $bulbWidth;
+        }
+        .progress-icon {
+            left: $bulbWidth;
+        }
+      }
+      
+      // Set the width of the labels based upon the configured values 
+      .step-labels {
+        .step-lbl.step#{$i} {
+          display: block;
+          width: nth($stepLabelWidths, $i);
+        }
+      }
+    }
+      
+  }
+}
